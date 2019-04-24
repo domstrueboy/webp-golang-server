@@ -15,6 +15,10 @@ const maxUploadSize = 9 * 1024 * 1024 // 9 mb
 const uploadPath = "./tmp"
 
 func main() {
+	static := http.FileServer(http.Dir("static"))
+  http.Handle("/", static)
+
+
 	http.HandleFunc("/upload", uploadFileHandler())
 
 	fs := http.FileServer(http.Dir(uploadPath))
