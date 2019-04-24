@@ -1,42 +1,33 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-	"io/ioutil"
-	"log"
+	"image/jpeg"
+	"os"
 
 	"github.com/chai2010/webp"
 )
 
 func main() {
-	var buf bytes.Buffer
-	var width, height int
-	var data []byte
-	var err error
 
-	// Load file data
-	if data, err = ioutil.ReadFile("./in/1.webp"); err != nil {
-		log.Println(err)
-	}
-
-	// GetInfo
-	if width, height, _, err = webp.GetInfo(data); err != nil {
-		log.Println(err)
-	}
-	fmt.Printf("width = %d, height = %d\n", width, height)
-
-	// Decode webp
-	m, err := webp.Decode(bytes.NewReader(data))
+	in, err := os.Open("./in/1.jpg")
 	if err != nil {
-		log.Println(err)
+		panic(err)
+	}
+	defer in.Close()
+
+	img, err := jpeg.Decode(in)
+	if err != nil {
+		panic(err)
 	}
 
-	// Encode lossless webp
-	if err = webp.Encode(&buf, m, &webp.Options{Lossless: true}); err != nil {
-		log.Println(err)
+	out, err := os.Create("./out/1.webp")
+	if err != nil {
+		panic(err)
 	}
-	if err = ioutil.WriteFile("./out/1.webp", buf.Bytes(), 0666); err != nil {
-		log.Println(err)
+	defer out.Close()
+
+	err = webp.Encode(out, img, &webp.Options{Quality: 70})
+	if err != nil {
+		panic(err)
 	}
 }
