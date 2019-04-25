@@ -12,12 +12,11 @@ import (
 )
 
 const maxUploadSize = 9 * 1024 * 1024 // 9 mb
-const uploadPath = "./tmp"
+const uploadPath = "./static/originals"
 
 func main() {
 	static := http.FileServer(http.Dir("static"))
-  http.Handle("/", static)
-
+	http.Handle("/", static)
 
 	http.HandleFunc("/upload", uploadFileHandler())
 
@@ -40,7 +39,7 @@ func uploadFileHandler() http.HandlerFunc {
 		log.Print("2", r.Body)
 		// parse and validate file and post parameters
 		fileType := r.PostFormValue("type")
-		file, _, err := r.FormFile("uploadFile")
+		file, _, err := r.FormFile("file")
 		log.Print("3", fileType, file, err)
 		if err != nil {
 			renderError(w, "INVALID_FILE", http.StatusBadRequest)
@@ -72,17 +71,19 @@ func uploadFileHandler() http.HandlerFunc {
 		}
 		log.Print("8")
 		fileName := randToken(12)
-		fileEndings, err := mime.ExtensionsByType(fileType)
+		log.Print(fileName)
+		fileEndings, err := mime.ExtensionsByType(filetype)
 		if err != nil {
 			renderError(w, "CANT_READ_FILE_TYPE", http.StatusInternalServerError)
 			return
 		}
 		log.Print("9")
 		newPath := filepath.Join(uploadPath, fileName+fileEndings[0])
-		fmt.Printf("FileType: %s, File: %s\n", fileType, newPath)
+		fmt.Printf("FileType: %s, File: %s\n", filetype, newPath)
 
 		// write file
 		log.Print("10")
+		log.Print(newPath)
 		newFile, err := os.Create(newPath)
 		if err != nil {
 			renderError(w, "CANT_WRITE_FILE", http.StatusInternalServerError)

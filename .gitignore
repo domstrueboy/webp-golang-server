@@ -13,3 +13,5 @@
 
 out
 tmp
+static/originals
+static/cache
