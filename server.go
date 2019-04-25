@@ -58,12 +58,13 @@ func uploadFileHandler() http.HandlerFunc {
 
 		// check file type, detectcontenttype only needs the first 512 bytes
 		filetype := http.DetectContentType(fileBytes)
+		log.Print(filetype)
 
 		log.Print("7")
 		switch filetype {
 		case "image/jpeg", "image/jpg":
 		case "image/gif", "image/png":
-		case "application/pdf":
+		case "image/webp":
 			break
 		default:
 			renderError(w, "INVALID_FILE_TYPE", http.StatusBadRequest)
@@ -73,6 +74,7 @@ func uploadFileHandler() http.HandlerFunc {
 		fileName := randToken(12)
 		log.Print(fileName)
 		fileEndings, err := mime.ExtensionsByType(filetype)
+		log.Print(fileEndings)
 		if err != nil {
 			renderError(w, "CANT_READ_FILE_TYPE", http.StatusInternalServerError)
 			return
