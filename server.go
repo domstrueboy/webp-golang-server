@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"webp-golang-server/modules/convert"
 
 	"github.com/h2non/filetype"
 )
@@ -83,6 +84,8 @@ func uploadFileHandler() http.HandlerFunc {
 		}
 
 		w.Write([]byte("SUCCESS"))
+
+		convert.JpgToWebp("./in/1.jpg", "./out/1.webp")
 	})
 }
 

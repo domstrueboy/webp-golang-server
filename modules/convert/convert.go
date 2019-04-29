@@ -1,4 +1,4 @@
-package main
+package convert
 
 import (
 	"image/jpeg"
@@ -7,9 +7,10 @@ import (
 	"github.com/chai2010/webp"
 )
 
-func main() {
+// JpgToWebp converts jpg to webp
+func JpgToWebp(inputPath string, outputPath string) {
 
-	in, err := os.Open("./in/1.jpg")
+	in, err := os.Open(inputPath) // ./in/1.jpg
 	if err != nil {
 		panic(err)
 	}
@@ -20,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	out, err := os.Create("./out/1.webp")
+	out, err := os.Create(outputPath) // ./out/1.webp
 	if err != nil {
 		panic(err)
 	}
