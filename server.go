@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/h2non/filetype"
 )
 
 const maxUploadSize = 9 * 1024 * 1024 // 9 mb
@@ -50,19 +52,16 @@ func uploadFileHandler() http.HandlerFunc {
 		}
 
 		// check file type, detectcontenttype only needs the first 512 bytes
-		filetype := http.DetectContentType(fileBytes)
+		fileType := http.DetectContentType(fileBytes)
 
-		switch filetype {
-		case "image/jpeg", "image/jpg":
-		case "image/gif", "image/png":
-		case "image/webp":
-			break
-		default:
+		if !filetype.IsImage(fileBytes) {
 			renderError(w, "INVALID_FILE_TYPE", http.StatusBadRequest)
 			return
 		}
+
 		fileName := randToken(12)
-		fileEndings, err := mime.ExtensionsByType(filetype)
+		mime.AddExtensionType(".webp", "image/webp")
+		fileEndings, err := mime.ExtensionsByType(fileType)
 
 		if err != nil {
 			renderError(w, "CANT_READ_FILE_TYPE", http.StatusInternalServerError)
@@ -70,8 +69,6 @@ func uploadFileHandler() http.HandlerFunc {
 		}
 
 		newPath := filepath.Join(uploadPath, fileName+fileEndings[0])
-		fmt.Printf("FileType: %s, File: %s\n", filetype, newPath)
-
 		// write file
 		newFile, err := os.Create(newPath)
 		if err != nil {
